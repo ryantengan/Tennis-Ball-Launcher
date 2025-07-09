@@ -12,12 +12,14 @@
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
 #include "sdkconfig.h"
+#include "driver/ledc.h"
 #include "pca9685.h"
+#include "fsm.h"
 
 // Servo motor control
 static void I2C_Init(void);
 static void PCA9685_Init(void);
-void task_PCA9685();
+static void PWM_Init(void);
 
 // Bluetooth communication
 uint8_t ble_addr_type;
@@ -44,11 +46,10 @@ static const struct ble_gatt_svc_def gatt_svcs[] = {
 
 void app_main()
 {
-    // // Initializing peripherals
-    // I2C_Init();
-    // PCA9685_Init();
-
-    // xTaskCreate(task_PCA9685, "task_PCA9685", 1024 * 2, NULL, 10, NULL);
+    // Initializing peripherals
+    I2C_Init();
+    PCA9685_Init();
+    PWM_Init();
 
     nvs_flash_init();                          // 1 - Initialize NVS flash using
     nimble_port_init();                        // 3 - Initialize the host stack
@@ -63,23 +64,7 @@ void app_main()
     nimble_port_freertos_init(host_task);      // 6 - Run the thread
 }
 
-void task_PCA9685()
-{
-    while (1)
-    {
-        setPWM(0, 0, 100);
-        printf("0 degrees\n"); fflush(stdout);
-        vTaskDelay(pdMS_TO_TICKS(1000));
-
-        setPWM(0, 0, 315);
-        printf("90 degrees\n"); fflush(stdout);
-        vTaskDelay(pdMS_TO_TICKS(1000));
-
-        setPWM(0, 0, 515);
-        printf("180 degrees\n"); fflush(stdout);
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-}
+/* SERVO MOTOR CONTROL */
 
 static void PCA9685_Init(void)
 {
@@ -104,26 +89,53 @@ static void I2C_Init(void)
     i2c_driver_install(i2c_master_port, conf.mode, 0, 0, 0);
 }
 
+static void PWM_Init(void)
+{
+    ledc_timer_config_t ledc_timer = {
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .timer_num = LEDC_TIMER_0,
+        .duty_resolution = LEDC_TIMER_13_BIT,
+        .freq_hz = 50,
+        .clk_cfg = LEDC_AUTO_CLK
+    };
+    ledc_timer_config(&ledc_timer);
+
+    ledc_channel_config_t ledc_channel = {
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .channel = LEDC_CHANNEL_0,
+        .timer_sel = LEDC_TIMER_0,
+        .intr_type = LEDC_INTR_DISABLE,
+        .gpio_num = 13,
+        .duty = 0,
+        .hpoint = 0
+    };
+    ledc_channel_config(&ledc_channel);
+}
+
+/* BLUETOOTH LOW ENERGY */
+
 // Write data to ESP32 defined as server
 static int device_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg)
 {
     char * data = (char *)ctxt->om->om_data;
     printf("%d\n",strcmp(data, (char *)"LIGHT ON")==0);
-    if (strcmp(data, (char *)"LIGHT ON\0")==0)
+    if (strcmp(data, (char *)"0\0")==0)
     {
-       printf("LIGHT ON\n");
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 205);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-    else if (strcmp(data, (char *)"LIGHT OFF\0")==0)
+    else if (strcmp(data, (char *)"90\0")==0)
     {
-        printf("LIGHT OFF\n");
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 614);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-    else if (strcmp(data, (char *)"FAN ON\0")==0)
+    else if (strcmp(data, (char *)"180\0")==0)
     {
-        printf("FAN ON\n");
-    }
-    else if (strcmp(data, (char *)"FAN OFF\0")==0)
-    {
-        printf("FAN OFF\n");
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 1023);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
     else{
         printf("Data from the client: %.*s\n", ctxt->om->om_len, ctxt->om->om_data);
