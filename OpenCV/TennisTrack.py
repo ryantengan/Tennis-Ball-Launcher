@@ -1,13 +1,17 @@
 import cv2
 import numpy as np
+import time  # Added for FPS throttle
 
-# Open webcam
-cap = cv2.VideoCapture(0)
+# Open ESP IP Web Server
+cap = cv2.VideoCapture('http://192.168.2.214/')
 
 while True:
     ret, frame = cap.read()
     if not ret:
         break
+
+    # ✅ Resize to reduce load — adjust scale as needed
+    frame = cv2.resize(frame, (0, 0), fx=5, fy=5)
 
     # Blur to reduce noise
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
@@ -40,6 +44,9 @@ while True:
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
 
     cv2.imshow("Tennis Ball Tracking", frame)
+
+    # ✅ Add small delay to throttle to ~10 FPS
+    time.sleep(0.1)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
