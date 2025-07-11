@@ -20,6 +20,9 @@
   "files.associations": {
     "ble_svc_gatt.h": "c",
     "esp_nimble_hci.h": "c",
-    "nimble_port_freertos.h": "c"
+    "nimble_port_freertos.h": "c",
+    "ble_svc_gap.h": "c",
+    "ble_server.h": "c",
+    "task.h": "c"
   }
 }
