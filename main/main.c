@@ -82,17 +82,31 @@ static void PWM_Init(void)
 
 static void BLE_Server_Init(void)
 {
-    nvs_flash_init();
-    nimble_port_init();
+    int rc;
 
+    // Initialize NVS and NimBLE stack
+    rc = nvs_flash_init();
+    if (rc != 0) {
+        ESP_LOGE("BLE", "nvs_flash_init failed: %d", rc);
+        return;
+    }
+    rc = nimble_port_init();
+    if (rc != 0) {
+        ESP_LOGE("BLE", "nimble_port_init failed: %d", rc);
+        return;
+    }
+
+    // Set device name and initialize GAP/GATT
     ble_svc_gap_device_name_set("Tennis Bot");
     ble_svc_gap_init();
     ble_svc_gatt_init();
 
-    static ble_uuid16_t read_uuid = BLE_UUID16_INIT(0xFEF4);
-    static ble_uuid16_t write_uuid = BLE_UUID16_INIT(0xDEAD);
+    // UUIDs
+    static ble_uuid16_t read_uuid   = BLE_UUID16_INIT(0xFEF4);
+    static ble_uuid16_t write_uuid  = BLE_UUID16_INIT(0xDEAD);
     static ble_uuid16_t service_uuid = BLE_UUID16_INIT(0x0180);
 
+    // GATT characteristics
     static struct ble_gatt_chr_def characteristics[] = {
         {
             .uuid = (ble_uuid_t *)&read_uuid,
@@ -106,18 +120,34 @@ static void BLE_Server_Init(void)
         },
         { 0 }
     };
-
+    // GATT services
     static const struct ble_gatt_svc_def gatt_svcs[] = {
         {
             .type = BLE_GATT_SVC_TYPE_PRIMARY,
             .uuid = (ble_uuid_t *)&service_uuid,
             .characteristics = characteristics
         },
-        { 0 }
+        { 0 }  // End of array
     };
 
-    ble_gatts_count_cfg(gatt_svcs);
-    ble_gatts_add_svcs(gatt_svcs);
+    // Register services
+    rc = ble_gatts_count_cfg(gatt_svcs);
+    if (rc != 0) {
+        ESP_LOGE("BLE", "ble_gatts_count_cfg failed: %d", rc);
+        return;
+    }
+    rc = ble_gatts_add_svcs(gatt_svcs);
+    if (rc != 0) {
+        ESP_LOGE("BLE", "ble_gatts_add_svcs failed: %d", rc);
+        return;
+    }
+
+    rc = ble_gatts_start();
+    if (rc != 0) {
+        ESP_LOGE("BLE", "ble_gatts_start failed: %d", rc);
+        return;
+    }
+
     ble_hs_cfg.sync_cb = ble_app_on_sync;
 }
 

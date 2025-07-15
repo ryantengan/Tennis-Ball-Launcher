@@ -15,17 +15,33 @@ int device_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_acc
     memcpy(buf, ctxt->om->om_data, len);
     buf[len] = '\0';  // Null terminate
 
-    if (strcmp(buf, "LIGHT ON") == 0)
+    if (strcmp(buf, "Up") == 0)
     {
-        printf("LIGHT ON\n");
+        printf("Up\n");
     }
-    else if (strcmp(buf, "90") == 0)
+    else if (strcmp(buf, "Down") == 0)
     {
-        printf("90 degrees\n");
+        printf("Down\n");
     }
-    else if (strcmp(buf, "180") == 0)
+    else if (strcmp(buf, "Left") == 0)
     {
-        printf("180 degrees\n");
+        printf("Left\n");
+    }
+    else if (strcmp(buf, "Right") == 0)
+    {
+        printf("Right\n");
+    }
+    else if (strcmp(buf, "Stop") == 0)
+    {
+        printf("Stop\n");
+    }
+    else if (strcmp(buf, "P") == 0)
+    {
+        printf("Pickup\n");
+    }
+    else if (strcmp(buf, "L") == 0)
+    {
+        printf("Launch\n");
     }
     else
     {
@@ -47,7 +63,6 @@ int ble_gap_event(struct ble_gap_event *event, void *arg)
 {
     switch (event->type)
     {
-    // Advertise if connected
     case BLE_GAP_EVENT_CONNECT:
         ESP_LOGI("GAP", "BLE GAP EVENT CONNECT %s", event->connect.status == 0 ? "OK!" : "FAILED!");
         if (event->connect.status != 0)
@@ -55,9 +70,9 @@ int ble_gap_event(struct ble_gap_event *event, void *arg)
             ble_app_advertise();
         }
         break;
-    // Advertise again after completion of the event
     case BLE_GAP_EVENT_DISCONNECT:
         ESP_LOGI("GAP", "BLE GAP EVENT DISCONNECTED");
+        ble_app_advertise();
         break;
     case BLE_GAP_EVENT_ADV_COMPLETE:
         ESP_LOGI("GAP", "BLE GAP EVENT");
