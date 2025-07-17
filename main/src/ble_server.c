@@ -38,6 +38,7 @@ int device_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_acc
     else if (strcmp(buf, "P") == 0)
     {
         printf("Pickup\n");
+        toggle_claw();
     }
     else if (strcmp(buf, "L") == 0)
     {
