@@ -23,6 +23,8 @@ void app_main()
     PWM_Init();
     BLE_Server_Init();
 
+    init_arm();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     nimble_port_freertos_init(host_task);
 }
 

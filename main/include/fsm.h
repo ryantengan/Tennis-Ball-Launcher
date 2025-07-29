@@ -15,7 +15,7 @@ extern volatile bool reset,
                     drive_flag,
                     is_tennis_ball,
                     in_range,
-                    pickup,
+                    picking_up,
                     ready_l,
                     launch;
 

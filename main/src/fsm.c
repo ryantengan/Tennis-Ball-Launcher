@@ -6,7 +6,7 @@ volatile bool reset,
             drive_flag,
             is_tennis_ball,
             in_range,
-            pickup,
+            picking_up,
             ready_l,
             launch;
 
@@ -23,7 +23,7 @@ void change_state()
         switch(state)
         {
             case DRIVE:
-                if (pickup && is_tennis_ball && in_range)
+                if (picking_up && is_tennis_ball && in_range)
                 {
                     drive_flag = false;
                     state = PICKING;
@@ -36,7 +36,7 @@ void change_state()
                 }
                 break;
             case PICKING:
-                if (!pickup)
+                if (!picking_up)
                 {
                     ready_l = true;
                     drive_flag = true;
