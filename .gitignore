@@ -1,8 +1,13 @@
+.vscode/
+
 # ESP-IDF files
 */build/
-*/sdkconfig
 */sdkconfig.old
+
 # Python venv and cache
-*/.venv/
+*.venv
 */__pycache__/
 *.pyc
+
+# Ignore Wi-Fi config
+esp-cam/main/wifi_config.h

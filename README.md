@@ -1,2 +1,2 @@
-# Tennis Ball Launcher (ESP32)
-RC car that picks up a tennis ball using a robot arm and launches it.
+# FetchBot - Tennis Ball-Throwing Robot Arm
+A robot arm powered by an ESP32 that detects tennis balls using computer vision and throws them. Designed for real-time object tracking, BLE control, and automated motion via servo actuation.
