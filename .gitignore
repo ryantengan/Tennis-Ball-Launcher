@@ -1,5 +1,8 @@
-build/
-sdkconfig
-sdkconfig.old
-control/.venv
-control/__pycache__
+# ESP-IDF files
+*/build/
+*/sdkconfig
+*/sdkconfig.old
+# Python venv and cache
+*/.venv/
+*/__pycache__/
+*.pyc
