@@ -59,16 +59,35 @@ void toggle_claw(void)
     vTaskDelay(pdMS_TO_TICKS(1000));
 }
 
-void pickup(void)
+void pick(void)
 {
     if (servo_angles[GRIPPERS] == GRIPPERS_CLOSED)
         toggle_claw();
     rotate_servo(FOREARM, 65);
     rotate_servo(ARM, 0);
 
-    toggle_claw(); // Grab object
+    // Grab object
+    vTaskDelay(pdMS_TO_TICKS(2000));
+    toggle_claw();
     vTaskDelay(pdMS_TO_TICKS(1000));
 
-    rotate_servo(ARM, 100);
-    rotate_servo(FOREARM, 145);
+    rotate_servo(ARM, 120);
+    rotate_servo(FOREARM, 180);
+}
+
+void launch(void)
+{
+    rotate_servo(FOREARM, 0);
+    rotate_servo(ARM, 180);
+
+    // Throw
+    vTaskDelay(pdMS_TO_TICKS(2000));
+    set_angle(ARM, 80);
+    set_angle(FOREARM, 60);
+    vTaskDelay(pdMS_TO_TICKS(500));
+    toggle_claw();
+    vTaskDelay(pdMS_TO_TICKS(2000));
+
+    rotate_servo(ARM, 120);
+    rotate_servo(FOREARM, 180);
 }

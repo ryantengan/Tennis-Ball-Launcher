@@ -15,39 +15,22 @@ int device_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_acc
     memcpy(buf, ctxt->om->om_data, len);
     buf[len] = '\0';  // Null terminate
 
-    if (strcmp(buf, "Up") == 0)
+    if (strcmp(buf, "P") == 0)
     {
-        printf("Up\n");
-    }
-    else if (strcmp(buf, "Down") == 0)
-    {
-        printf("Down\n");
-    }
-    else if (strcmp(buf, "Left") == 0)
-    {
-        printf("Left\n");
-    }
-    else if (strcmp(buf, "Right") == 0)
-    {
-        printf("Right\n");
-    }
-    else if (strcmp(buf, "Stop") == 0)
-    {
-        printf("Stop\n");
-    }
-    else if (strcmp(buf, "P") == 0)
-    {
-        printf("Pickup\n");
-        toggle_claw();
+        printf("BLE Server: Picking up\n");
+        flags.pick = true;
     }
     else if (strcmp(buf, "L") == 0)
     {
-        printf("Launch\n");
+        flags.launch = true;
+        printf("BLE Server: Launch\n");
     }
     else
     {
-        printf("Invalid data: %s\n", buf);
+        printf("BLE Server: Invalid data: %s\n", buf);
     }
+
+    change_state();
 
     return 0;
 }

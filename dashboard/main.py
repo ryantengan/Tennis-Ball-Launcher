@@ -22,7 +22,6 @@ class Dashboard:
         self.root.bind('<Escape>', lambda event: self.on_close())
         for key in ['<Left>', '<Right>', '<Up>', '<Down>', '<p>', '<l>', '<P>', '<L>']:
             self.root.bind(key, self.on_key)
-            self.root.bind(f'<KeyRelease-{key[1:-1]}>', self.on_key_release)
         self.ble_client = None
         self.ble_loop = asyncio.new_event_loop()
         threading.Thread(target=self.run_ble_loop, daemon=True).start()
@@ -124,7 +123,7 @@ class Dashboard:
                         print("Service:", s)
                     return
 
-            self.mode_v.config(text=f"Device not found")
+            self.mode_v.config(text=f"Automatic")
 
         self.ble_loop.call_soon_threadsafe(asyncio.create_task, connect())
 
@@ -154,20 +153,6 @@ class Dashboard:
                 try:
                     await self.ble_client.write_gatt_char('0000dead-0000-1000-8000-00805f9b34fb', msg)
                     print('Sent:', key)
-                except Exception as e:
-                    print('BLE send error:', e)
-
-            self.ble_loop.call_soon_threadsafe(asyncio.create_task, send())
-
-    def on_key_release(self, event):
-        self.state_v.config(text=f'Stop')
-        if self.ble_client and self.ble_client.is_connected:
-            msg = 'Stop'.encode()
-
-            async def send():
-                try:
-                    await self.ble_client.write_gatt_char('0000dead-0000-1000-8000-00805f9b34fb', msg)
-                    print('Sent: Stop')
                 except Exception as e:
                     print('BLE send error:', e)
 

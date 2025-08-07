@@ -2,22 +2,23 @@
 #define FSM_H
 
 #include <stdbool.h>
+#include "arm.h"
 
 typedef enum {
-    DRIVE,
-    PICKING,
-    LAUNCHING
+    IDLE,
+    CARRYING
 } state_t;
 extern volatile state_t state;
 
-extern volatile bool reset,
-                    mode, // 0 = autonomous, 1 = manual
-                    drive_flag,
-                    is_tennis_ball,
-                    in_range,
-                    picking_up,
-                    ready_l,
-                    launch;
+typedef struct {
+    bool reset;
+    bool mode;
+    bool is_tennis_ball;
+    bool in_range;
+    bool pick;
+    bool launch;
+} flags_t;
+extern volatile flags_t flags;
 
 void change_state();
 

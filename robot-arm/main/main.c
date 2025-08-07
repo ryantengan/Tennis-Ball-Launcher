@@ -23,21 +23,7 @@ void app_main()
     PWM_Init();
     BLE_Server_Init();
 
-    // while (1)
-    // {
-    //     set_angle(FOREARM, 0);
-    //     printf("0 degrees\n");
-    //     vTaskDelay(1000 / portTICK_PERIOD_MS);
-    //     set_angle(FOREARM, 90);
-    //     printf("90 degrees\n");
-    //     vTaskDelay(1000 / portTICK_PERIOD_MS);
-    //     set_angle(FOREARM, 180);
-    //     printf("180 degrees\n");
-    //     vTaskDelay(1000 / portTICK_PERIOD_MS);
-    // }
-
     init_arm();
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
     nimble_port_freertos_init(host_task);
 }
 

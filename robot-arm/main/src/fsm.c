@@ -1,53 +1,35 @@
 #include "fsm.h"
 
-volatile state_t state = DRIVE;
-volatile bool reset,
-            mode,
-            drive_flag,
-            is_tennis_ball,
-            in_range,
-            picking_up,
-            ready_l,
-            launch;
+volatile state_t state = IDLE;
+volatile flags_t flags = {0};
 
 void change_state()
 {
-    if (reset)
+    if (flags.reset)
     {
-        state = DRIVE;
-        mode = true;
-        drive_flag = true;
+        state = IDLE;
+        flags.mode = true;
     }
     else
     {
-        switch(state)
+        switch (state)
         {
-            case DRIVE:
-                if (picking_up && is_tennis_ball && in_range)
+            case IDLE:
+                if (flags.pick /*&& flags.is_tennis_ball*/)
                 {
-                    drive_flag = false;
-                    state = PICKING;
-                }
-                if (launch)
-                {
-                    ready_l = false;
-                    drive_flag = false;
-                    state = LAUNCHING;
+                    pick();
+                    flags.pick = false;
+
+                    state = CARRYING;
                 }
                 break;
-            case PICKING:
-                if (!picking_up)
+            case CARRYING:
+                if (flags.launch)
                 {
-                    ready_l = true;
-                    drive_flag = true;
-                    state = DRIVE;
-                }
-                break;
-            case LAUNCHING:
-                if (!launch)
-                {
-                    drive_flag = true;
-                    state = DRIVE;
+                    launch();
+                    flags.launch = false;
+
+                    state = IDLE;
                 }
                 break;
         }

@@ -3,7 +3,7 @@ import numpy as np
 import time  # Added for FPS throttle
 
 # Open ESP IP Web Server
-cap = cv2.VideoCapture('http://192.168.2.214/')
+cap = cv2.VideoCapture('http://10.0.0.98/')
 
 while True:
     ret, frame = cap.read()

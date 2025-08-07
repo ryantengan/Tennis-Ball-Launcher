@@ -18,6 +18,7 @@ void set_angle(joint_t joint, int angle);
 void rotate_servo(joint_t, int angle);
 void init_arm(void);
 void toggle_claw(void);
-void pickup(void);
+void pick(void);
+void launch(void);
 
 #endif
